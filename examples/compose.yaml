@@ -1,0 +1,17 @@
+# Jellyfin with the plugin, next to a backend container (see docs/BACKEND-API.md)
+# that creates its socket in the shared folder. Audio comes back over the socket;
+# nothing else is shared.
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:12
+    user: 1000:100
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      # set the plugin's Download folder to /media/remote-search, the default lives in /config
+      - ./music:/media/remote-search
+      # the backend must create the socket so that uid 1000 can connect
+      - ./run:/run/remote-search
+    restart: unless-stopped

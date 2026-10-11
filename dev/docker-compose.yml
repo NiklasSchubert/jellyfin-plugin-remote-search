@@ -1,0 +1,12 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:12.2
+    container_name: jellyfin-remote-search-dev
+    user: "${JF_UID:-1000}:${JF_GID:-100}"
+    ports:
+      - "18096:8096"
+    volumes:
+      - ./env/config:/config
+      - ./env/cache:/cache
+      - ./env/music:/music
+      - ./env/run:/run/remote-search
