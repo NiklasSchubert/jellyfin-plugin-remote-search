@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Remote Search</title>
+</head>
+<body>
+    <div id="RemoteSearchConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="RemoteSearchConfigForm">
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="BackendSocketPath">Backend socket</label>
+                        <input id="BackendSocketPath" name="BackendSocketPath" type="text" is="emby-input" />
+                        <div class="fieldDescription">Unix socket of a backend that implements <code>docs/BACKEND-API.md</code>, e.g. on a volume shared with its container.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="DownloadPath">Download folder</label>
+                        <input id="DownloadPath" name="DownloadPath" type="text" is="emby-input" />
+                        <div class="fieldDescription">Empty: <code>&lt;data dir&gt;/remote-search-music</code> (<code>/config/data/remote-search-music</code> in Docker).</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="LibraryName">Library name</label>
+                        <input id="LibraryName" name="LibraryName" type="text" is="emby-input" />
+                        <div class="fieldDescription">If no library contains the download folder, it is added to the library with this name, or a new music library with this name is created.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="DebounceMs">Search debounce (ms)</label>
+                        <input id="DebounceMs" name="DebounceMs" type="number" min="0" required is="emby-input" />
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="SearchTimeoutMs">Search timeout (ms)</label>
+                        <input id="SearchTimeoutMs" name="SearchTimeoutMs" type="number" min="100" required is="emby-input" />
+                        <div class="fieldDescription">Longer searches keep running and fill the cache for the next query.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="MinTermLength">Minimum search length</label>
+                        <input id="MinTermLength" name="MinTermLength" type="number" min="1" required is="emby-input" />
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="MaxResults">Remote results per search</label>
+                        <input id="MaxResults" name="MaxResults" type="number" min="1" required is="emby-input" />
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="PlaceholderMaxAgeDays">Forget unplayed results after (days)</label>
+                        <input id="PlaceholderMaxAgeDays" name="PlaceholderMaxAgeDays" type="number" min="1" required is="emby-input" />
+                    </div>
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            (function () {
+                const pluginId = '3b64e14b-48d8-4945-820b-dfb0d38ecfff';
+                const textFields = ['BackendSocketPath', 'DownloadPath', 'LibraryName'];
+                const numberFields = ['DebounceMs', 'SearchTimeoutMs', 'MinTermLength', 'MaxResults', 'PlaceholderMaxAgeDays'];
+                const page = document.querySelector('#RemoteSearchConfigPage');
+
+                page.addEventListener('pageshow', function () {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        textFields.concat(numberFields).forEach(function (field) {
+                            page.querySelector('#' + field).value = config[field];
+                        });
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+                page.querySelector('#RemoteSearchConfigForm').addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                        textFields.forEach(function (field) {
+                            config[field] = page.querySelector('#' + field).value.trim();
+                        });
+                        numberFields.forEach(function (field) {
+                            config[field] = parseInt(page.querySelector('#' + field).value, 10);
+                        });
+                        ApiClient.updatePluginConfiguration(pluginId, config).then(Dashboard.processPluginConfigurationUpdateResult);
+                    });
+                    return false;
+                });
+            })();
+        </script>
+    </div>
+</body>
+</html>

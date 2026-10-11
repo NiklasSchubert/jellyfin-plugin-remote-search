@@ -1,0 +1,8 @@
+bin/
+obj/
+result
+dev/out/
+dev/env/
+deploy/
+docs/private/
+out/
