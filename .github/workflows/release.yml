@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  JPRM_VERSION: 1.1.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.x"
+      - run: pip install "jprm==$JPRM_VERSION"
+
+      - run: dotnet test Jellyfin.Plugin.RemoteSearch.sln --configuration Release
+
+      - name: Build plugin zip
+        id: build
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          zip=$(jprm plugin build . --output=artifacts --version="$version")
+          echo "zip=$zip" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # a re-run after a failed manifest step finds the release already there
+        run: |
+          zip="${{ steps.build.outputs.zip }}"
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$zip" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$zip" --generate-notes
+          fi
+
+      - name: Add version to the manifest on gh-pages
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          repo="${GITHUB_REPOSITORY#*/}"
+          if git ls-remote --exit-code --heads origin gh-pages; then
+            git fetch origin gh-pages
+            git worktree add pages gh-pages
+          else
+            git worktree add --orphan -b gh-pages pages
+            echo '[]' > pages/manifest.json
+            touch pages/.nojekyll
+          fi
+          jprm repo add --url="https://$owner.github.io/$repo" pages/manifest.json "${{ steps.build.outputs.zip }}"
+          cd pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "release: $GITHUB_REF_NAME"
+          git push origin gh-pages

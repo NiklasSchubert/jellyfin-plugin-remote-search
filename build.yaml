@@ -1,0 +1,17 @@
+---
+name: "Remote Search"
+guid: "3b64e14b-48d8-4945-820b-dfb0d38ecfff"
+version: "0.1.0.0"
+targetAbi: "12.0.0.0"
+framework: "net10.0"
+overview: "Results from an external music backend in Jellyfin search, downloaded on play"
+description: >
+  Adds tracks from a backend you run (see docs/BACKEND-API.md) to Jellyfin's
+  search, below local results, in every client. Playing one downloads it into
+  a music library.
+category: "General"
+owner: "NiklasSchubert"
+artifacts:
+- "Jellyfin.Plugin.RemoteSearch.dll"
+changelog: >
+  First release.
