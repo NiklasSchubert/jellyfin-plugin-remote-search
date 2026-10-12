@@ -33,6 +33,7 @@ jobs:
         id: build
         run: |
           version="${GITHUB_REF_NAME#v}"
+          mkdir -p artifacts
           zip=$(jprm plugin build . --output=artifacts --version="$version")
           echo "zip=$zip" >> "$GITHUB_OUTPUT"
 
