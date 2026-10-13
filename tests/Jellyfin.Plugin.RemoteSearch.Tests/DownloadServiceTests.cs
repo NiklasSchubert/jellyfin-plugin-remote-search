@@ -186,6 +186,10 @@ public sealed class DownloadServiceTests : IDisposable
     {
         public List<string> AddedFiles { get; } = [];
 
-        public void FileAdded(string path) => AddedFiles.Add(path);
+        public Task FileAddedAsync(string path)
+        {
+            AddedFiles.Add(path);
+            return Task.CompletedTask;
+        }
     }
 }

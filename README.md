@@ -29,10 +29,12 @@ endpoints, described in [docs/BACKEND-API.md](docs/BACKEND-API.md).
 3. Run a backend whose socket Jellyfin can reach (default
    `/run/remote-search/backend.sock`, changeable on the plugin's settings page).
 
-On startup the plugin creates a music library "Remote Search" for its download
-folder (`/config/data/remote-search-music` in Docker) unless a library already
-contains it. If a library with that name exists, the folder is added to it
-instead. Both the folder and the library name are settings.
+On the first download the plugin creates a music library "Remote Search" for
+its download folder (`/config/data/remote-search-music` in Docker) unless a
+library already contains it. If a library with that name exists, the folder is
+added to it instead. Both the folder and the library name are settings; set
+them before the first play. Changing them later leaves the old folder in its
+library.
 
 [`examples/compose.yaml`](examples/compose.yaml) shows the Jellyfin side in
 Docker.

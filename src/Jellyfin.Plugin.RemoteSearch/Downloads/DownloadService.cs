@@ -84,7 +84,7 @@ public sealed class DownloadService
                 _ledger.Save(NewEntry(track, path));
             }
 
-            _libraryRefresher.FileAdded(path);
+            await _libraryRefresher.FileAddedAsync(path).ConfigureAwait(false);
             return path;
         }
         finally
