@@ -8,6 +8,14 @@
         "category": "General",
         "versions": [
             {
+                "version": "0.1.1.0",
+                "changelog": "The music library is created on the first download instead of at startup, so setting the download folder and library name after install leaves no stale library behind.\n",
+                "targetAbi": "12.0.0.0",
+                "sourceUrl": "https://niklasschubert.github.io/jellyfin-plugin-remote-search/remote-search/remote-search_0.1.1.0.zip",
+                "checksum": "267615cefd819cd857ca95a2a1bb445d",
+                "timestamp": "2026-10-13T11:34:50Z"
+            },
+            {
                 "version": "0.1.0.0",
                 "changelog": "First release.\n",
                 "targetAbi": "12.0.0.0",
